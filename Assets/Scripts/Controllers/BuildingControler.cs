@@ -38,17 +38,20 @@ namespace Controllers
         {
             if (_model.GetStatus()==BuildingStatus.Available)
             {
-                currentGrid.SetObjectOnGrid(gameObject,_model.Size);
+                currentGrid.SetBuildingOnGrid(gameObject,_model.Size);
                 _model.ChangeStatus(BuildingStatus.Placed);
             }
         }
 
         private void OnMouseDown()
         {
+            print("asdsd");
             if(_model.GetStatus()==BuildingStatus.Placed)
             {
-                print("sss");
+                InformationPanel.RaiseOnInformationSet(_model);
+                print(_model);
             }
+            print("ssa"+_model.GetStatus());
         }
 
         private void OnMouseUp()

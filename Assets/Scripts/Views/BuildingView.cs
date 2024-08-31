@@ -56,7 +56,7 @@ namespace Views
                 _healthText.text = $"Health: {health}";
             }
         }
-
+       
         private void SetBuildingSprite()
         {
             if (_sprite==null)

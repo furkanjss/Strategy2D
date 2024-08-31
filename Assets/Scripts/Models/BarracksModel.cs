@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Models
@@ -7,10 +8,10 @@ namespace Models
     {
         public event Action OnSoldierProduced;
         private GameObject _soldierPrefab;
-
+        private List<SoldierData> SoldierDatas = new List<SoldierData>();
         public BarracksModel(BuildingData buildingData) : base(buildingData)
         {
-            //_soldierPrefab = buildingData.soldierPrefab;
+            SoldierDatas = buildingData.SoldierDatas;
         }
 
         public void ProduceSoldier()
@@ -24,8 +25,12 @@ namespace Models
 
         private Vector3 GetRandomPosition()
         {
-            // Askerin spawn edileceği rasgele bir konum belirleyin
-            return Vector3.zero; // Örnek olarak sıfır vektörü döndürüyoruz
+            return Vector3.zero;
+        }
+
+        public  List<SoldierData> GetSoldierDatas()
+        {
+            return SoldierDatas;
         }
     }
 }

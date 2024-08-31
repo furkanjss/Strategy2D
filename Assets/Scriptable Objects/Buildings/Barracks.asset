@@ -18,3 +18,7 @@ MonoBehaviour:
   buildingPrefab: {fileID: 3812224905731081329, guid: 419ad28aa6ccdc24cb6f16dbf2912004, type: 3}
   sizeBuilding: {x: 4, y: 4}
   health: 100
+  SoldierDatas:
+  - {fileID: 11400000, guid: 7ff8d44a9cc39b64c8a69fa09ff1d080, type: 2}
+  - {fileID: 11400000, guid: bc29d301486519140a4a0b0342f4a9c5, type: 2}
+  - {fileID: 11400000, guid: 57938e1201d620949b7d3a8a65f480cb, type: 2}

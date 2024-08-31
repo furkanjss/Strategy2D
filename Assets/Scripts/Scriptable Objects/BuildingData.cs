@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Models;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ public class BuildingData : ScriptableObject
     public GameObject buildingPrefab;       
     public Vector2Int sizeBuilding;         
     public int health;
-    public BuildingModel buildingModel;
+    public List<SoldierData> SoldierDatas = new List<SoldierData>();
 }
 
 public enum BuildType

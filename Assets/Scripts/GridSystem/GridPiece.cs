@@ -16,11 +16,13 @@ public class GridPiece : MonoBehaviour
 
     private GridManager gridManager;
     private SpriteRenderer spriteRenderer;
+    private Collider2D _collider;
     private void Awake()
     {
         gridManager = FindObjectOfType<GridManager>();
         Neighbours = new List<GridPiece>();
         spriteRenderer = transform.GetChild(0).GetComponent<SpriteRenderer>();
+        _collider = GetComponent<Collider2D>();
     }
     
 
@@ -44,7 +46,12 @@ public class GridPiece : MonoBehaviour
         };
     }
 
-    public void SetObjectOnGrid(GameObject obj, Vector2Int size)
+    public void SetSoldierOnGrid()
+    {
+        IsAvailable = false;
+        ApplyColliderFeature(false);
+    }
+    public void SetBuildingOnGrid(GameObject obj, Vector2Int size)
     {
        if( IsPossiblePlaceObject(size))
         {
@@ -55,6 +62,8 @@ public class GridPiece : MonoBehaviour
             IsAvailable = false;
 
             ApplyBlackColor();
+            ApplyColliderFeature(false);
+
         }
         else
         {
@@ -89,6 +98,7 @@ public class GridPiece : MonoBehaviour
                     targetPiece.CurrentObjectOnGrid = obj;
                     obj.transform.parent = targetPiece.transform;
                     obj.transform.localPosition=new Vector3(.3f,0,0);
+                    obj.transform.parent = null;
                 }
             }
         }
@@ -119,12 +129,17 @@ public class GridPiece : MonoBehaviour
                 {
                     targetPiece.IsAvailable = false;
                     targetPiece.ApplyBlackColor();
+                    targetPiece.ApplyColliderFeature(false);
                     targetPiece.CurrentObjectOnGrid = CurrentObjectOnGrid;
                 }
             }
         }
     }
 
+    public void ApplyColliderFeature(bool isEnabled)
+    {
+        _collider.enabled = isEnabled;
+    }
     public void ApplyBlackColor()
     {
         spriteRenderer.color = Color.black;

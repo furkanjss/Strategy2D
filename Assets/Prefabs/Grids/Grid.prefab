@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5717465094508238381}
   - component: {fileID: 2509897090009517075}
-  - component: {fileID: 5421282443164890818}
+  - component: {fileID: 8237206975489493361}
   m_Layer: 0
   m_Name: Grid
   m_TagString: Untagged
@@ -48,7 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GScore: 0
   HScore: 0
---- !u!61 &5421282443164890818
+--- !u!61 &8237206975489493361
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -80,7 +80,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.009512842, y: 0.0054481626}
+  m_Offset: {x: -0.0020323694, y: 0.0040647388}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -91,7 +91,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.6004138, y: 0.54091156}
+  m_Size: {x: 0.5162954, y: 0.46345365}
   m_EdgeRadius: 0
 --- !u!1 &4864241914472671674
 GameObject:

@@ -11,13 +11,29 @@ namespace Models
         private BuildingStatus _buildingStatus;
         private float _health;
         private float _maxHealth;
-        private Vector2Int _size;
+        private GameObject _buildingPrefab;
+        private Sprite _buildingSprite;
+  
+        private BuildType buildType;
+
+        #region Encapsulation
+
+        private Vector2Int size;
+        private string name; 
+
+        #endregion
+      
         public Vector2Int Size
         {
-            get { return _size; }
-            set { _size = value; }
-        }        private GameObject _buildingPrefab;
-        private Sprite _buildingSprite;
+            get => size;
+            set => size = value;
+        }
+
+        public string Name
+        {
+            get => name;
+            set => name = value;
+        } 
 
         public BuildingModel(BuildingData buildingData)
         {
@@ -25,7 +41,9 @@ namespace Models
             _buildingSprite = buildingData.buildImage;
             _maxHealth = buildingData.health;
             _health = _maxHealth;
-            _size = buildingData.sizeBuilding;
+            size = buildingData.sizeBuilding;
+            name = buildingData.buildingName;
+            buildType = buildingData.buildingType;
             ChangeStatus(BuildingStatus.Available);
         }
 
@@ -53,12 +71,8 @@ namespace Models
             OnHealthChanged?.Invoke(_health);
         }
 
-        public void Heal(float amount)
-        {
-            _health += amount;
-            if (_health > _maxHealth) _health = _maxHealth;
-            OnHealthChanged?.Invoke(_health);
-        }
+        public BuildType GetBuildType() => buildType;
+
 
     }
     
