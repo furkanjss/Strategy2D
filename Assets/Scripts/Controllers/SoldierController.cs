@@ -40,17 +40,17 @@ namespace Controllers
 
             foreach (var gridPiece in targetGridPieces)
             {
-                // Nesneyi hedef grid parçasının altına taşı
                 transform.parent = gridPiece.transform;
                 transform.localPosition = Vector3.zero;
-
-                // Belirli bir süre bekle
                 yield return new WaitForSeconds(delayBetweenMoves);
             }
-
-            // Son hedef grid parçasını güncelle
             _model.CurrentGrid = transform.parent.GetComponent<GridPiece>();
             _model.CurrentGrid.SetSoldierOnGrid(this.gameObject);
+        }
+
+        public void SetInformationToPanel()
+        {
+            InformationPanel.RaiseOnInformationSet(_model);
         }
 
     }

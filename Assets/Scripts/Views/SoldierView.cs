@@ -4,33 +4,23 @@ using UnityEngine;
 
 namespace Views
 {
-    public class SoldierView: MonoBehaviour
+    public class SoldierView : BaseView<SoldierModel>
     {
-        private SoldierModel _model;
-        private SpriteRenderer _spriteRenderer;
-
-        private void Awake()
+        protected override void Awake()
         {
-            _spriteRenderer = GetComponent<SpriteRenderer>();
+            base.Awake();
         }
 
-        public void Initialize(SoldierModel soldierModel)
+        public override void Initialize(SoldierModel soldierModel)
         {
-            if (soldierModel == null)
-            {
-                throw new ArgumentException(nameof(soldierModel), "Soldier model cannot be null");
-            }
-            _model = soldierModel;
-            SetSoldierSprite();
+            base.Initialize(soldierModel);
         }
-        private void SetSoldierSprite()
+
+        protected override void SetSprite()
         {
-            if (_spriteRenderer == null)
-            {
-                _spriteRenderer = GetComponent<SpriteRenderer>();
-            }
-            _spriteRenderer.sprite = _model.GetSoldierSprite();
+            base.SetSprite();
+            // Additional setup for soldier sprite if necessary
         }
-        
     }
+
 }

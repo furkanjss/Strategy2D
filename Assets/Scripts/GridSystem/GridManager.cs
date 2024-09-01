@@ -4,21 +4,11 @@ using UnityEngine;
 
 public class GridManager : MonoBehaviour
 {
-    public static GridManager Instance { get; private set; }
 
     [SerializeField] public GridPiece[,] grid;
     [SerializeField] public int width;
     [SerializeField] public int height;
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject); 
-            return;
-        }
 
-        Instance = this; 
-    }
     private void Start()
     {
         InitializeGrid();

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Models;
 using TMPro;
 using UnityEngine;
@@ -6,70 +7,55 @@ using UnityEngine;
 
 namespace Views
 {
-    public class BuildingView: MonoBehaviour
+    public class BuildingView : BaseView<BuildingModel>
     {
-        private Sprite _sprite;
-        private BuildingModel _model;
         private TextMeshPro _healthText;
-        private void Awake()
+
+        protected override void Awake()
         {
-            _sprite = transform.GetChild(0).GetComponent<Sprite>();
+            base.Awake();
             _healthText = transform.GetChild(1).GetComponent<TextMeshPro>();
-
         }
 
-        public void Initialize(BuildingModel buildingModel)
+        public override void Initialize(BuildingModel buildingModel)
         {
-            if (buildingModel == null)
-            {
-                throw new ArgumentException(nameof(buildingModel), "Building model cannot be null");
-            }
-
-            _model = buildingModel;
+            base.Initialize(buildingModel);
             _model.OnStatusChanged += UpdateView;
-            _model.OnHealthChanged += UpdateHealthView;
-
             UpdateView(_model.GetStatus());
-            UpdateHealthView(_model.GetHealth());
-            SetBuildingSprite();
-            print(_model.Size);
         }
 
+        protected override void SetSprite()
+        {
+            base.SetSprite();
+            // Additional setup for building sprite if necessary
+        }
 
         private void UpdateView(BuildingStatus status)
         {
             switch (status)
             {
                 case BuildingStatus.Available:
-                   
+                    // Logic for available status
                     break;
                 case BuildingStatus.Placed:
-                 //s   ClearBuildingSprite();
+                    // Logic for placed status
                     break;
             }
         }
 
-        private void UpdateHealthView(float health)
+        protected override void UpdateHealthView(float health)
         {
             if (_healthText != null)
             {
                 _healthText.text = $"Health: {health}";
             }
         }
-       
-        private void SetBuildingSprite()
+
+        protected override void OnDestroy()
         {
-            if (_sprite==null)
-            {
-                _sprite = transform.GetChild(0).GetComponent<Sprite>();
-            }
-            _sprite = _model.GetBuildingSprite();
-        }
-        
-        private void OnDestroy()
-        {
+            base.OnDestroy();
             _model.OnStatusChanged -= UpdateView;
-            _model.OnHealthChanged -= UpdateHealthView;
         }
     }
+
 }

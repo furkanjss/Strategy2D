@@ -37,9 +37,9 @@ namespace Controllers
         {
             if (_model.GetStatus()==BuildingStatus.Available)
             {
-                currentGrid.SetBuildingOnGrid(gameObject,_model.Size);
-                _model.ChangeStatus(BuildingStatus.Placed);
-                ChangeLayer();
+                    currentGrid.SetBuildingOnGrid(gameObject,_model.Size);
+                    _model.ChangeStatus(BuildingStatus.Placed);
+                    ChangeLayer();
             }
         }
 
@@ -84,6 +84,7 @@ namespace Controllers
                 }
                 else
                 {
+                    _view.HighlightInvalidPlacement();
                     print("No Empty Place For Building " + _model.GetStatus());
                 }
             }

@@ -42,7 +42,7 @@ public class GridPiece : MonoBehaviour,IInteractable
 
     public void SetTargetGrid(GridPiece gridPiece)
     {
-        SoldierController.MoveToTarget(GridManager.Instance.FindShortestPath(this,gridPiece));
+        SoldierController.MoveToTarget(gridManager.FindShortestPath(this,gridPiece));
         ClearGrid();
 
     }
@@ -98,11 +98,8 @@ public class GridPiece : MonoBehaviour,IInteractable
        if( IsPossiblePlaceObject(size))
         {
             PlaceObjectOnGrid(obj, size);
-
             OccupySpace(size);
-
             IsAvailable = false;
-
             ApplyBlackColor();
 
         }
@@ -131,7 +128,7 @@ public class GridPiece : MonoBehaviour,IInteractable
         {
             return;
         }
-        CurrentObjectOnGrid.GetComponent<BuildingControler>().SetInformation();
+        CurrentObjectOnGrid.GetComponent<SoldierController>().SetInformationToPanel();
 
     }
     private void PlaceObjectOnGrid(GameObject obj, Vector2Int size)

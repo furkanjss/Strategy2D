@@ -12,89 +12,89 @@ public class InformationPanel : MonoBehaviour
    
    [SerializeField] private GameObject SoldierProducedButtonPrefab;
 
-   public static event Action<BuildingModel> OnInformationSet;
-   public static void RaiseOnInformationSet(BuildingModel buildingModel)
+   public static event Action<BaseModel> OnInformationSet;
+   public static void RaiseOnInformationSet(BaseModel model)
    {
-      OnInformationSet?.Invoke(buildingModel);
+      OnInformationSet?.Invoke(model);
    }
-   [SerializeField] private TextMeshProUGUI buildingName;
+   [SerializeField] private TextMeshProUGUI nameText;
    [SerializeField] private TextMeshProUGUI healthText;
-   [SerializeField] private Image buildingImage;
+   [SerializeField] private Image modelImage;
    [SerializeField] private Transform buttonsParent;
-   private BuildingModel modelInformation;
-   public void SetInformation(BuildingModel model)
-   {
-      if (modelInformation == model)
-      {
-         Debug.Log("Information already set.");
-         return;
-      }
 
-      if (modelInformation != null)
-      {
-         ClearInformation();
-      }
+    private BaseModel modelInformation;
 
-      modelInformation = model;
+    public void SetInformation(BaseModel model)
+    {
+        if (modelInformation == model)
+        {
+            Debug.Log("Information already set.");
+            return;
+        }
 
-      UpdateBuildingInfo();
+        if (modelInformation != null)
+        {
+            ClearInformation();
+        }
 
-      if (modelInformation is BarracksModel barracksModel)
-      {
-         CreateSoldierButtons(barracksModel);
-      }
-   }
+        modelInformation = model;
+        UpdateModelInfo();
 
-   private void UpdateBuildingInfo()
-   {
-      if (modelInformation == null) return;
+        if (modelInformation is BarracksModel barracksModel)
+        {
+            CreateSoldierButtons(barracksModel);
+        }
+    }
 
-      buildingImage.sprite = modelInformation.GetBuildingSprite();
-      buildingName.text = modelInformation.Name;
-      healthText.text = $"Health: {modelInformation.GetHealth()}";
+    private void UpdateModelInfo()
+    {
+        if (modelInformation == null) return;
 
-      modelInformation.OnHealthChanged += UpdateHealthView;
-   }
+        modelImage.sprite = modelInformation.GetSprite();
+        nameText.text = modelInformation.Name;
+        healthText.text = $"Health: {modelInformation.GetHealth()}";
 
-   private void CreateSoldierButtons(BarracksModel barracksModel)
-   {
-      int soldierCount = barracksModel.GetSoldierDatas().Count;
-      for (int i = 0; i < soldierCount; i++)
-      {
-         var soldierButton = Instantiate(SoldierProducedButtonPrefab, buttonsParent);
-         soldierButton.transform.localPosition = new Vector3(0, -150 * i, 0);
+        modelInformation.OnHealthChanged += UpdateHealthView;
+    }
 
-         var soldierData = barracksModel.GetSoldierDatas()[i];
-         soldierButton.GetComponentInChildren<TextMeshProUGUI>().text = soldierData.name;
-         soldierButton.transform.GetChild(1).GetComponent<Image>().sprite = soldierData.soldierSprite;
-         soldierButton.GetComponent<UnitsButton>().GetSoldierData(barracksModel.GetSoldierDatas()[i]);
-      }
-   }
+    private void CreateSoldierButtons(BarracksModel barracksModel)
+    {
+        int soldierCount = barracksModel.GetSoldierDatas().Count;
+        for (int i = 0; i < soldierCount; i++)
+        {
+            var soldierButton = Instantiate(SoldierProducedButtonPrefab, buttonsParent);
+            soldierButton.transform.localPosition = new Vector3(0, -150 * i, 0);
 
-   private void OnEnable()
-   {
-      OnInformationSet += SetInformation;
-   }
+            var soldierData = barracksModel.GetSoldierDatas()[i];
+            soldierButton.GetComponentInChildren<TextMeshProUGUI>().text = soldierData.name;
+            soldierButton.transform.GetChild(1).GetComponent<Image>().sprite = soldierData.soldierSprite;
+            soldierButton.GetComponent<UnitsButton>().GetSoldierData(barracksModel.GetSoldierDatas()[i]);
+        }
+    }
 
-   void UpdateHealthView(float health)=>     healthText.text = $"Health: {health}";
-   void ClearInformation()
-   {
-      modelInformation.OnHealthChanged -= UpdateHealthView;
-      
-      
-      foreach (Transform child in buttonsParent)
-      {
-         Destroy(child.gameObject);
-      }
-   }
+    private void OnEnable()
+    {
+        OnInformationSet += SetInformation;
+    }
 
-   private void OnDisable()
-   {
-      if (modelInformation!=null)
-      {
-         modelInformation.OnHealthChanged -= UpdateHealthView;
-      }
-      OnInformationSet -= SetInformation;
+    private void UpdateHealthView(float health) => healthText.text = $"Health: {health}";
 
-   }
+    private void ClearInformation()
+    {
+        modelInformation.OnHealthChanged -= UpdateHealthView;
+
+        foreach (Transform child in buttonsParent)
+        {
+            Destroy(child.gameObject);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (modelInformation != null)
+        {
+            modelInformation.OnHealthChanged -= UpdateHealthView;
+        }
+        OnInformationSet -= SetInformation;
+    }
 }
