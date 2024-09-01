@@ -19,7 +19,7 @@ namespace Models
         {
             _damage = soldierData.damage;
         }
-
+       
         public float GetDamage() => _damage;
 
        

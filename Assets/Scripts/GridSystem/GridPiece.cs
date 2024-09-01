@@ -20,6 +20,7 @@ public class GridPiece : MonoBehaviour,IInteractable
     private SpriteRenderer spriteRenderer;
     private Collider2D _collider;
     private SoldierController SoldierController;
+
     private void Awake()
     {
         gridManager = FindObjectOfType<GridManager>();
@@ -28,23 +29,38 @@ public class GridPiece : MonoBehaviour,IInteractable
         _collider = GetComponent<Collider2D>();
     }
 
+   public GridPiece GetGrid() => GetComponent<GridPiece>();
     public bool CanMove()
     {
-        if (SoldierController)
+        return SoldierController != null;
+    }
+
+    public void SetTargetGrid(GridPiece gridPiece, bool isAttack)
+    {
+        GridPiece targetGrid = gridPiece;
+
+        if (isAttack)
         {
-            return true;
+            Vector2Int targetPosition = gridPiece.GridPosition; 
+            targetGrid = gridManager.FindClosestAvailableGrid(targetPosition);
+
+            if (targetGrid == null)
+            {
+                Debug.LogWarning("Available Grid Cannot Find");
+                return;
+            }
+        }
+
+        List<GridPiece> path = gridManager.FindShortestPath(this, targetGrid);
+        if (path != null && path.Count > 0)
+        {
+            SoldierController.MoveToTarget(path, isAttack, isAttack ? gridPiece : null);
         }
         else
         {
-            return false;
+            Debug.LogWarning("No way");
         }
-    }
-
-    public void SetTargetGrid(GridPiece gridPiece)
-    {
-        SoldierController.MoveToTarget(gridManager.FindShortestPath(this,gridPiece));
         ClearGrid();
-
     }
     public void SetGridData(Vector2Int gridPosition, int gScore, int hScore)
     {
@@ -66,17 +82,7 @@ public class GridPiece : MonoBehaviour,IInteractable
         };
     }
 
-    public bool IsEmpty()
-    {
-        if (IsAvailable)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
+ 
 
     public void ClearGrid()
     {
@@ -128,9 +134,26 @@ public class GridPiece : MonoBehaviour,IInteractable
         {
             return;
         }
-        CurrentObjectOnGrid.GetComponent<SoldierController>().SetInformationToPanel();
+        var buildingController = CurrentObjectOnGrid.GetComponent<BuildingController>();
+        if (buildingController != null)
+        {
+            buildingController.SetInformation();
+        }
+        else
+        {
+            var soldierController = CurrentObjectOnGrid.GetComponent<SoldierController>();
+            if (soldierController != null)
+            {
+                soldierController.SetInformationToPanel();
+            }
+            else
+            {
+                Debug.LogWarning("Neither BuildingController nor SoldierController component found on the GameObject.");
+            }
+        }
 
     }
+
     private void PlaceObjectOnGrid(GameObject obj, Vector2Int size)
     {
         Vector3Int offset = new Vector3Int(size.x / 2, size.y / 2, 0);

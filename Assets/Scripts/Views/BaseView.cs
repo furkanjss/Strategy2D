@@ -40,7 +40,6 @@ namespace Views
 
         protected virtual void UpdateHealthView(float health)
         {
-            // This method can be overridden in derived classes if needed
         }
 
         protected virtual void OnDestroy()
@@ -57,6 +56,14 @@ namespace Views
             }
         }
 
+        public void DamageEffect()
+        {
+            if (_spriteRenderer != null)
+            {
+                _spriteRenderer.color = Color.red;
+                StartCoroutine(ResetColorAfterDelay(1f));
+            }
+        }
         private IEnumerator ResetColorAfterDelay(float delay)
         {
             yield return new WaitForSeconds(delay);

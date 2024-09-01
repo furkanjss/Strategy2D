@@ -162,4 +162,29 @@ public class GridManager : MonoBehaviour
             }
         }
     }
+    public GridPiece FindClosestAvailableGrid(Vector2Int targetPosition)
+    {
+        GridPiece closest = null;
+        float closestDistance = float.MaxValue;
+
+        foreach (var gridPiece in grid)
+        {
+            if (gridPiece.IsAvailable)
+            {
+                float distance = Vector2Int.Distance(gridPiece.GridPosition, targetPosition);
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closest = gridPiece;
+                }
+            }
+        }
+
+        if (closest == null)
+        {
+            Debug.LogWarning("No available grid piece found!");
+        }
+
+        return closest;
+    }
 }

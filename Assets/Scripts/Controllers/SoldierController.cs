@@ -7,34 +7,21 @@ using Views;
 using UnityEngine;
 namespace Controllers
 {
-    public class SoldierController : MonoBehaviour
+    public class SoldierController : BaseController<SoldierModel, SoldierView>
     {
         [SerializeField] private SoldierData _soldierData;
-        protected SoldierModel _model;
-        protected SoldierView _view;
-     
-        protected virtual void Start()
+
+        protected override SoldierModel CreateModel()
         {
-            _view = transform.GetChild(0).GetComponent<SoldierView>();
-            _model = new SoldierModel(_soldierData);
-            Initialize(_model, _view);
-            _model.CurrentGrid = transform.parent.GetComponent<GridPiece>();
+            return new SoldierModel(_soldierData);
         }
 
-        protected void Initialize(SoldierModel model, SoldierView view)
+        public void MoveToTarget(List<GridPiece> gridPieces, bool isAttack, GridPiece attackGrid = null)
         {
-            _model = model;
-            _view = view;
-            _view.Initialize(_model);
+            StartCoroutine(MoveToGridsSequentially(gridPieces, isAttack, attackGrid));
         }
 
-        public void MoveToTarget(List<GridPiece> gridPieces)
-        {
-           
-            StartCoroutine(MoveToGridsSequentially(gridPieces));
-        }
-
-        private IEnumerator MoveToGridsSequentially(List<GridPiece> targetGridPieces)
+        private IEnumerator MoveToGridsSequentially(List<GridPiece> targetGridPieces, bool isAttack, GridPiece attackGrid = null)
         {
             float delayBetweenMoves = 0.1f;
 
@@ -44,15 +31,33 @@ namespace Controllers
                 transform.localPosition = Vector3.zero;
                 yield return new WaitForSeconds(delayBetweenMoves);
             }
+
             _model.CurrentGrid = transform.parent.GetComponent<GridPiece>();
             _model.CurrentGrid.SetSoldierOnGrid(this.gameObject);
-        }
 
+            if (isAttack)
+            {
+                if (attackGrid != null && attackGrid.CurrentObjectOnGrid != null)
+                {
+                    SoldierController attacker = attackGrid.CurrentObjectOnGrid.GetComponent<SoldierController>();
+                    if (attacker != null)
+                    {
+                        attacker.ApplyDamage(_model.GetDamage());
+                    }
+                }
+            }
+        }
         public void SetInformationToPanel()
         {
             InformationPanel.RaiseOnInformationSet(_model);
         }
-
+        
+        public override void OnDeath()
+        {
+            Destroy(gameObject,2);
+            transform.parent.GetComponent<GridPiece>().ClearGrid();
+        }
     }
+
 
 }
