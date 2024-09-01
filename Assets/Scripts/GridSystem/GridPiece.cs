@@ -1,16 +1,13 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using Controllers;
 using Interfaces;
 using UnityEngine;
 
-[Serializable]
-public class GridPiece : MonoBehaviour,IInteractable
+public class GridPiece : MonoBehaviour, IInteractable
 {
     public bool IsAvailable { get; private set; }
     public Vector2Int GridPosition { get; private set; }
-    public List<GridPiece> Neighbours { get;  set; }
+    public List<GridPiece> Neighbours { get; set; }
     public GameObject CurrentObjectOnGrid { get; private set; }
 
     [HideInInspector] public int GScore;
@@ -21,6 +18,9 @@ public class GridPiece : MonoBehaviour,IInteractable
     private Collider2D _collider;
     private SoldierController SoldierController;
 
+    // Listeyi ekliyoruz
+    private  List<GridPiece> occupiedObjects = new List<GridPiece>();
+
     private void Awake()
     {
         gridManager = FindObjectOfType<GridManager>();
@@ -29,7 +29,8 @@ public class GridPiece : MonoBehaviour,IInteractable
         _collider = GetComponent<Collider2D>();
     }
 
-   public GridPiece GetGrid() => GetComponent<GridPiece>();
+    public GridPiece GetGrid() => GetComponent<GridPiece>();
+
     public bool CanMove()
     {
         return SoldierController != null;
@@ -37,11 +38,12 @@ public class GridPiece : MonoBehaviour,IInteractable
 
     public void SetTargetGrid(GridPiece gridPiece, bool isAttack)
     {
+      
         GridPiece targetGrid = gridPiece;
 
         if (isAttack)
         {
-            Vector2Int targetPosition = gridPiece.GridPosition; 
+            Vector2Int targetPosition = gridPiece.GridPosition;
             targetGrid = gridManager.FindClosestAvailableGrid(targetPosition);
 
             if (targetGrid == null)
@@ -51,17 +53,23 @@ public class GridPiece : MonoBehaviour,IInteractable
             }
         }
 
+        Debug.Log($"Target Grid: {targetGrid.name}");
+
         List<GridPiece> path = gridManager.FindShortestPath(this, targetGrid);
+    
         if (path != null && path.Count > 0)
         {
+            Debug.Log($"Path found with {path.Count} pieces.");
             SoldierController.MoveToTarget(path, isAttack, isAttack ? gridPiece : null);
+            ClearGrid();
         }
         else
         {
-            Debug.LogWarning("No way");
+            Debug.LogWarning("No path found.");
         }
-        ClearGrid();
+   
     }
+
     public void SetGridData(Vector2Int gridPosition, int gScore, int hScore)
     {
         GridPosition = gridPosition;
@@ -82,32 +90,46 @@ public class GridPiece : MonoBehaviour,IInteractable
         };
     }
 
- 
-
     public void ClearGrid()
     {
         IsAvailable = true;
         CurrentObjectOnGrid = null;
         SoldierController = null;
         ApplyWhiteColor();
+
+        if (occupiedObjects.Count > 0)
+        {
+            foreach (GridPiece gridObj in occupiedObjects)
+            {
+                gridObj.IsAvailable = true;
+                gridObj.ApplyWhiteColor();
+                
+            }
+            occupiedObjects.Clear();
+            Debug.Log("Occupied objects cleared.");
+        }
+        else
+        {
+            Debug.Log("No occupied objects to clear.");
+        }
     }
     public GameObject GetCurrentObject() => CurrentObjectOnGrid;
+
     public void SetSoldierOnGrid(GameObject soldierObj)
     {
         IsAvailable = false;
         CurrentObjectOnGrid = soldierObj;
         SoldierController = soldierObj.GetComponent<SoldierController>();
-
     }
+
     public void SetBuildingOnGrid(GameObject obj, Vector2Int size)
     {
-       if( IsPossiblePlaceObject(size))
+        if (IsPossiblePlaceObject(size))
         {
             PlaceObjectOnGrid(obj, size);
             OccupySpace(size);
             IsAvailable = false;
             ApplyBlackColor();
-
         }
         else
         {
@@ -117,20 +139,12 @@ public class GridPiece : MonoBehaviour,IInteractable
 
     public bool IsPossiblePlaceObject(Vector2Int size)
     {
-        if (IsSpaceAvailable(size))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-
-        }
+        return IsSpaceAvailable(size);
     }
 
     public void SetInformationToPanel()
     {
-        if (CurrentObjectOnGrid==null)
+        if (CurrentObjectOnGrid == null)
         {
             return;
         }
@@ -151,7 +165,6 @@ public class GridPiece : MonoBehaviour,IInteractable
                 Debug.LogWarning("Neither BuildingController nor SoldierController component found on the GameObject.");
             }
         }
-
     }
 
     private void PlaceObjectOnGrid(GameObject obj, Vector2Int size)
@@ -168,12 +181,14 @@ public class GridPiece : MonoBehaviour,IInteractable
                 {
                     targetPiece.CurrentObjectOnGrid = obj;
                     obj.transform.parent = targetPiece.transform;
-                    obj.transform.localPosition=new Vector3(.3f,0,0);
-                
+                    obj.transform.localPosition = new Vector3(.3f, 0, 0);
+                    targetPiece.occupiedObjects = this.occupiedObjects;
+                    occupiedObjects.Clear();
                 }
             }
         }
     }
+
     private bool IsSpaceAvailable(Vector2Int size)
     {
         for (int x = 0; x < size.x; x++)
@@ -201,16 +216,20 @@ public class GridPiece : MonoBehaviour,IInteractable
                     targetPiece.IsAvailable = false;
                     targetPiece.ApplyBlackColor();
                     targetPiece.CurrentObjectOnGrid = CurrentObjectOnGrid;
+                    if (!occupiedObjects.Contains(targetPiece))
+                    {
+                        occupiedObjects.Add(targetPiece);
+                    }
                 }
             }
         }
     }
 
-
     public void ApplyBlackColor()
     {
         spriteRenderer.color = Color.black;
     }
+
     public void ApplyWhiteColor()
     {
         spriteRenderer.color = Color.white;

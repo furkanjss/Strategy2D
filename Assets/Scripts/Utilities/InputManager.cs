@@ -54,6 +54,7 @@ namespace Utilities
         {
             IInteractable interactable = transform.GetComponent<IInteractable>();
             if (interactable == null) return;
+            if (interactable == _currentInteractable) return;
 
             if (interactable.CanMove())
             {
@@ -99,7 +100,6 @@ namespace Utilities
                     }
 
                     _currentInteractable.SetTargetGrid(gridPiece, true);
-                    _currentInteractable = null;
                 }
                 else
                 {

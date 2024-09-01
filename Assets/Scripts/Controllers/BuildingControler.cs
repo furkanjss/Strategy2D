@@ -35,6 +35,8 @@ namespace Controllers
             currentGrid.SetBuildingOnGrid(gameObject, _model.Size);
             _model.ChangeStatus(BuildingStatus.Placed);
             ChangeLayer();
+            GetComponent<Collider2D>().enabled = false;
+            Destroy(GetComponent<Rigidbody>());
         }
     }
 
@@ -51,7 +53,12 @@ namespace Controllers
             transform.position = position;
         }
     }
+    public override void OnDeath()
+    {
+        currentGrid.ClearGrid();
+        Destroy(gameObject);
 
+    }
     public void OnDragEnd(Vector3 position)
     {
         if (_model.GetStatus() == BuildingStatus.Available)

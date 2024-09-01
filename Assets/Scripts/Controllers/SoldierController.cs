@@ -39,10 +39,18 @@ namespace Controllers
             {
                 if (attackGrid != null && attackGrid.CurrentObjectOnGrid != null)
                 {
-                    SoldierController attacker = attackGrid.CurrentObjectOnGrid.GetComponent<SoldierController>();
-                    if (attacker != null)
+                    var targetObject = attackGrid.CurrentObjectOnGrid;
+
+                    SoldierController soldier = targetObject.GetComponent<SoldierController>();
+                    if (soldier != null)
                     {
-                        attacker.ApplyDamage(_model.GetDamage());
+                        soldier.ApplyDamage(_model.GetDamage());
+                        yield break; 
+                    }
+                    BuildingController building = targetObject.GetComponent<BuildingController>();
+                    if (building != null)
+                    {
+                        building.ApplyDamage(_model.GetDamage());
                     }
                 }
             }
