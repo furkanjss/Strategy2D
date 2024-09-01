@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2672562224284870111}
   - component: {fileID: 8142552898205641372}
   - component: {fileID: 6130407139702365680}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: ModelSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -73,7 +73,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_Sprite: {fileID: 21300000, guid: 92cd2a6cd6108a14883c11bc9502b3f0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -142,7 +142,7 @@ GameObject:
   - component: {fileID: 2185768811602634833}
   - component: {fileID: -3652982370174724919}
   - component: {fileID: -2541886424062340806}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BarrackPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -261,7 +261,7 @@ GameObject:
   - component: {fileID: 6147137610069140757}
   - component: {fileID: 8828550086417450551}
   - component: {fileID: 3733069648027107783}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Health Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -431,7 +431,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4500546573110059452}
   - component: {fileID: 8166673901942462810}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BuildingView
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -23,8 +23,9 @@ public class UnitsButton : MonoBehaviour
         GridPiece targetGrid = GridManager.Instance.FindEmptyGrid();
         if (targetGrid!=null)
         {
-            targetGrid.SetSoldierOnGrid();
-            Instantiate(soldierData.soldierPrefab,targetGrid.transform);
+              GameObject tempSoldier=    Instantiate(soldierData.soldierPrefab,targetGrid.transform);
+            targetGrid.SetSoldierOnGrid(tempSoldier);
+            tempSoldier.transform.localPosition = new Vector3(0, 0, 5);
 
         }
     }

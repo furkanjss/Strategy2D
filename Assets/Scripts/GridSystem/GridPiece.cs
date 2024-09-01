@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Controllers;
+using Interfaces;
 using UnityEngine;
 
 [Serializable]
-public class GridPiece : MonoBehaviour
+public class GridPiece : MonoBehaviour,IInteractable
 {
     public bool IsAvailable { get; private set; }
     public Vector2Int GridPosition { get; private set; }
@@ -17,6 +19,7 @@ public class GridPiece : MonoBehaviour
     private GridManager gridManager;
     private SpriteRenderer spriteRenderer;
     private Collider2D _collider;
+    private SoldierController SoldierController;
     private void Awake()
     {
         gridManager = FindObjectOfType<GridManager>();
@@ -24,8 +27,25 @@ public class GridPiece : MonoBehaviour
         spriteRenderer = transform.GetChild(0).GetComponent<SpriteRenderer>();
         _collider = GetComponent<Collider2D>();
     }
-    
 
+    public bool CanMove()
+    {
+        if (SoldierController)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public void SetTargetGrid(GridPiece gridPiece)
+    {
+        SoldierController.MoveToTarget(GridManager.Instance.FindShortestPath(this,gridPiece));
+        ClearGrid();
+
+    }
     public void SetGridData(Vector2Int gridPosition, int gScore, int hScore)
     {
         GridPosition = gridPosition;
@@ -46,10 +66,32 @@ public class GridPiece : MonoBehaviour
         };
     }
 
-    public void SetSoldierOnGrid()
+    public bool IsEmpty()
+    {
+        if (IsAvailable)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public void ClearGrid()
+    {
+        IsAvailable = true;
+        CurrentObjectOnGrid = null;
+        SoldierController = null;
+        ApplyWhiteColor();
+    }
+    public GameObject GetCurrentObject() => CurrentObjectOnGrid;
+    public void SetSoldierOnGrid(GameObject soldierObj)
     {
         IsAvailable = false;
-        ApplyColliderFeature(false);
+        CurrentObjectOnGrid = soldierObj;
+        SoldierController = soldierObj.GetComponent<SoldierController>();
+
     }
     public void SetBuildingOnGrid(GameObject obj, Vector2Int size)
     {
@@ -62,7 +104,6 @@ public class GridPiece : MonoBehaviour
             IsAvailable = false;
 
             ApplyBlackColor();
-            ApplyColliderFeature(false);
 
         }
         else
@@ -83,6 +124,16 @@ public class GridPiece : MonoBehaviour
 
         }
     }
+
+    public void SetInformationToPanel()
+    {
+        if (CurrentObjectOnGrid==null)
+        {
+            return;
+        }
+        CurrentObjectOnGrid.GetComponent<BuildingControler>().SetInformation();
+
+    }
     private void PlaceObjectOnGrid(GameObject obj, Vector2Int size)
     {
         Vector3Int offset = new Vector3Int(size.x / 2, size.y / 2, 0);
@@ -98,7 +149,7 @@ public class GridPiece : MonoBehaviour
                     targetPiece.CurrentObjectOnGrid = obj;
                     obj.transform.parent = targetPiece.transform;
                     obj.transform.localPosition=new Vector3(.3f,0,0);
-                    obj.transform.parent = null;
+                
                 }
             }
         }
@@ -129,17 +180,13 @@ public class GridPiece : MonoBehaviour
                 {
                     targetPiece.IsAvailable = false;
                     targetPiece.ApplyBlackColor();
-                    targetPiece.ApplyColliderFeature(false);
                     targetPiece.CurrentObjectOnGrid = CurrentObjectOnGrid;
                 }
             }
         }
     }
 
-    public void ApplyColliderFeature(bool isEnabled)
-    {
-        _collider.enabled = isEnabled;
-    }
+
     public void ApplyBlackColor()
     {
         spriteRenderer.color = Color.black;

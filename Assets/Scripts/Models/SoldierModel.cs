@@ -8,16 +8,25 @@ namespace Models
         public event Action<float> OnHealthChanged;
 
         private float _health;
-        private float _maxHealth;
-        private float _damage;
-        private Sprite soldierSprite;
+        private readonly float _maxHealth;
+        private readonly float _damage;
+        private readonly Sprite _soldierSprite;
         #region Encapsulation
+        private GridPiece currentGrid;
 
-        private string name;
+        private GridPiece _currentGrid;
+        private string _name;
+
         public string Name
         {
-            get => name;
-            set => name = value;
+            get => _name;
+            set => _name = value;
+        }
+
+        public GridPiece CurrentGrid
+        {
+            get => _currentGrid;
+            set => _currentGrid = value;
         }
 
         #endregion
@@ -26,10 +35,10 @@ namespace Models
             _maxHealth = soldierData.health;
             _health = _maxHealth;
             _damage = soldierData.damage;
-            name = soldierData.soldierName;
-            soldierSprite = soldierData.soldierSprite;
+            _name  = soldierData.soldierName;
+            _soldierSprite = soldierData.soldierSprite;
         }
-        public Sprite GetSoldierSprite() => soldierSprite;
+        public Sprite GetSoldierSprite() => _soldierSprite;
 
         public float GetHealth() => _health;
         public void TakeDamage(float damage)
@@ -40,5 +49,6 @@ namespace Models
         }
         public float GetDamage() => _damage;
 
+       
     }
 }

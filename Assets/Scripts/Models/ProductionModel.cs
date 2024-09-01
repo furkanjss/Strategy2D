@@ -9,7 +9,7 @@ public class ProductionModel
   private ProductionStatus _productionStatus;
   private BuildType _buildType;
   private GameObject _buildPrefab;
-  private Sprite _productionSprite;
+  private readonly Sprite _productionSprite;
 
   public ProductionModel(BuildingData buildingData)
   {

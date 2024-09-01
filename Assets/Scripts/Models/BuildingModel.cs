@@ -10,12 +10,9 @@ namespace Models
 
         private BuildingStatus _buildingStatus;
         private float _health;
-        private float _maxHealth;
-        private GameObject _buildingPrefab;
-        private Sprite _buildingSprite;
-  
+        private readonly float _maxHealth;
+        private readonly Sprite _buildingSprite;
         private BuildType buildType;
-
         #region Encapsulation
 
         private Vector2Int size;
@@ -37,7 +34,7 @@ namespace Models
 
         public BuildingModel(BuildingData buildingData)
         {
-            _buildingPrefab = buildingData.buildingPrefab;
+  
             _buildingSprite = buildingData.buildImage;
             _maxHealth = buildingData.health;
             _health = _maxHealth;
@@ -58,7 +55,7 @@ namespace Models
             }
         }
 
-        public GameObject GetBuildPrefab() => _buildingPrefab;
+
 
         public BuildingStatus GetStatus() => _buildingStatus;
 

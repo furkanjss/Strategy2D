@@ -59,7 +59,7 @@ namespace Controllers
 
         private Vector3 GetSpawnPosition()
         {
-            return new Vector3(0, 0, 0);
+            return new Vector3(0, -4, 0);
         }
 
         private void OnDestroy()

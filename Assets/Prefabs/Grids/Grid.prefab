@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5717465094508238381}
   - component: {fileID: 2509897090009517075}
   - component: {fileID: 8237206975489493361}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Grid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -103,7 +103,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6829706696105275717}
   - component: {fileID: 5489636633079677736}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: TileSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}

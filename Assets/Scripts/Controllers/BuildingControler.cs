@@ -16,7 +16,6 @@ namespace Controllers
         protected Camera mainCamera;
         private IBuildingFactory _buildingFactory;
         protected GridPiece currentGrid;
-        private Vector3 offset;
         protected virtual void Start()
         {
             mainCamera = Camera.main;
@@ -40,39 +39,57 @@ namespace Controllers
             {
                 currentGrid.SetBuildingOnGrid(gameObject,_model.Size);
                 _model.ChangeStatus(BuildingStatus.Placed);
+                ChangeLayer();
             }
         }
 
-        private void OnMouseDown()
+        void ChangeLayer()
         {
-            print("asdsd");
+            int newLayer = LayerMask.NameToLayer( "Ignore Raycast");
+            gameObject.layer =newLayer;
+        }
+
+
+        public void SetInformation()
+        {
             if(_model.GetStatus()==BuildingStatus.Placed)
             {
                 InformationPanel.RaiseOnInformationSet(_model);
                 print(_model);
             }
-            print("ssa"+_model.GetStatus());
+        }
+     
+   
+        public void OnDrag(Vector3 position)
+        {
+            if (_model.GetStatus() == BuildingStatus.Available)
+            {
+                transform.position = position;
+            }
         }
 
-        private void OnMouseUp()
+        public void OnDragEnd(Vector3 position)
         {
+
             if (_model.GetStatus() == BuildingStatus.Available)
             {
                 Vector3 mousePosition = Input.mousePosition;
                 mousePosition.z = mainCamera.WorldToScreenPoint(transform.position).z;
-                offset = transform.position - mainCamera.ScreenToWorldPoint(mousePosition);
-
+              
                 GetCollidedGrid(mousePosition);
-             
-                if (currentGrid != null&&currentGrid.IsPossiblePlaceObject(_model.Size))
+
+                if (currentGrid != null && currentGrid.IsPossiblePlaceObject(_model.Size))
                 {
                     PlaceBuilding();
                 }
                 else
                 {
-                    print("No Empty Place For Building"+  _model.GetStatus());
-                  
+                    print("No Empty Place For Building " + _model.GetStatus());
                 }
+            }
+            else
+            {
+                 SetInformation();
             }
         }
 
@@ -94,17 +111,6 @@ namespace Controllers
             }
 
         }
-        private void OnMouseDrag()
-        {
-            if (_model.GetStatus() == BuildingStatus.Available)
-            {
-                Vector3 mousePosition = Input.mousePosition;
-                mousePosition.z = mainCamera.WorldToScreenPoint(transform.position).z;
-                transform.position = mainCamera.ScreenToWorldPoint(mousePosition) + offset;
-            }
-          
-        }
-
-       
+        
     }
 }

@@ -6,65 +6,82 @@ namespace Utilities
 {
     public class InputManager:MonoBehaviour
     {
-        private Camera mainCam;
-        public GameObject selectedObject;
-        Vector3 offset;
+        private Camera _mainCamera;
+        private IDraggable _currentDraggable;
+        private IInteractable _currentInteractable;
+        private bool _isDragging;
+        [SerializeField] private LayerMask interactableLayer;
+
         private void Start()
         {
-            mainCam=Camera.main;
-            
+            _mainCamera = Camera.main;
         }
 
-        void Update()
+        private void Update()
         {
-            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            HandleInput();
+        }
 
+        private void HandleInput()
+        {
             if (Input.GetMouseButtonDown(0))
             {
-                Collider2D targetObject = Physics2D.OverlapPoint(mousePosition);
+                Vector2 mousePosition = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
+                RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, interactableLayer);
 
-                if (targetObject.GetComponent<IDraggable>()!=null&&targetObject!=null)
+                if (hit.collider != null)
                 {
-                    selectedObject = targetObject.transform.gameObject;
-                    offset = selectedObject.transform.position - mousePosition;
+                 
+                    IInteractable interactable = hit.transform.GetComponent<IInteractable>();
+                    if (interactable!=null)
+                    {
+                        if (interactable.CanMove())
+                        {
+                            _currentInteractable=interactable;
+                        }
+                        else
+                        {
+                            interactable.SetInformationToPanel();
+                        }
+                     
+                    }
+                    _currentDraggable = hit.transform.GetComponent<IDraggable>();
+                    if (_currentDraggable != null)
+                    {
+                        
+                        _currentInteractable = null;
+                        _isDragging = true;
+                    }
+                    if (_currentDraggable==null&&_currentInteractable!=null)
+                    {
+                        if (hit.collider.gameObject.GetComponent<GridPiece>()!=null&&hit.collider.gameObject.GetComponent<GridPiece>().IsAvailable)
+                        {
+                            _currentInteractable.SetTargetGrid(hit.collider.gameObject.GetComponent<GridPiece>());
+                            _currentInteractable = null;
+                        }
+                    }
                 }
             }
 
-            if (selectedObject)
+            if (_isDragging)
             {
-                selectedObject.transform.position = mousePosition + offset;
-            }
-
-            if (Input.GetMouseButtonUp(0) && selectedObject)
-            {
-                selectedObject = null;
-            }
-        }
-        private void GetClickedObject()
-        {
-            Ray ray = mainCam.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit))
-            {
-                IDraggable ıDraggable = hit.collider.gameObject.GetComponent<IDraggable>();
-                if (ıDraggable != null)
+                if (Input.GetMouseButton(0))
                 {
-                    // Object has the Interactable script, call its interaction method
-                   print(hit.collider.gameObject);
+                    Vector3 mousePosition = _mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, _mainCamera.nearClipPlane));
+                    mousePosition.z = _mainCamera.WorldToScreenPoint(transform.position).z;
+                    _currentDraggable?.OnDrag(mousePosition);
+                }
+
+                if (Input.GetMouseButtonUp(0))
+                {
+                    Vector3 mousePosition = _mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, _mainCamera.nearClipPlane));
+                    mousePosition.z = _mainCamera.WorldToScreenPoint(transform.position).z;
+                    _isDragging = false;
+                    _currentDraggable?.OnDragEnd(mousePosition);
+                    _currentDraggable = null;
                 }
             }
         }
-        private void HandleMouseInput()
-        {
-            if (Input.GetMouseButton(0))
-            {
-               
-            }
-            Vector3 mousePosition = Input.mousePosition;
-            Debug.Log("Mouse Position: " + mousePosition);
-        }
-
-      
     }
     
 }
