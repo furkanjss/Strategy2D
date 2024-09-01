@@ -1,6 +1,6 @@
 using System;
 using Factory;
-using Interfaces;
+
 using Models;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -8,13 +8,13 @@ using Views;
 
 namespace Controllers
 {
-   public class BuildingController : BaseController<BuildingModel, BuildingView>, IDraggable
+   public class BuildingController : BaseController<BuildingModel, BuildingView>
 {
     [SerializeField] private BuildingData _buildingData;
     private Camera mainCamera;
     private IBuildingFactory _buildingFactory;
     protected GridPiece currentGrid;
-
+    private Vector3 offset;
     protected override void Start()
     {
         mainCamera = Camera.main;
@@ -45,50 +45,35 @@ namespace Controllers
         int newLayer = LayerMask.NameToLayer("Ignore Raycast");
         gameObject.layer = newLayer;
     }
+    
 
-    public void OnDrag(Vector3 position)
-    {
-        if (_model.GetStatus() == BuildingStatus.Available)
-        {
-            transform.position = position;
-        }
-    }
-    public override void OnDeath()
-    {
-        currentGrid.ClearGrid();
-        Destroy(gameObject);
-
-    }
-    public void OnDragEnd(Vector3 position)
+    private void OnMouseUp()
     {
         if (_model.GetStatus() == BuildingStatus.Available)
         {
             Vector3 mousePosition = Input.mousePosition;
             mousePosition.z = mainCamera.WorldToScreenPoint(transform.position).z;
+            offset = transform.position - mainCamera.ScreenToWorldPoint(mousePosition);
 
             GetCollidedGrid(mousePosition);
-
-            if (currentGrid != null && currentGrid.IsPossiblePlaceObject(_model.Size))
+             
+            if (currentGrid != null&&currentGrid.IsPossiblePlaceObject(_model.Size))
             {
                 PlaceBuilding();
             }
             else
             {
-                _view.HighlightInvalidPlacement();
-                Debug.Log("No Empty Place For Building " + _model.GetStatus());
+                print("No Empty Place For Building"+  _model.GetStatus());
+                  _view.HighlightInvalidPlacement();
             }
-        }
-        else
-        {
-            SetInformation();
         }
     }
 
-    private void GetCollidedGrid(Vector3 mousePosition)
+    void GetCollidedGrid(Vector3 mousePosition)
     {
         Vector3 worldMousePosition = mainCamera.ScreenToWorldPoint(mousePosition);
-        worldMousePosition.z = 0;
-        float radius = 0.5f;
+        worldMousePosition.z = 0; 
+        float radius = 0.5f; 
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(worldMousePosition, radius);
 
         foreach (Collider2D collider in hitColliders)
@@ -100,6 +85,25 @@ namespace Controllers
                 break;
             }
         }
+
     }
+    private void OnMouseDrag()
+    {
+        if (_model.GetStatus() == BuildingStatus.Available)
+        {
+            Vector3 mousePosition = Input.mousePosition;
+            mousePosition.z = mainCamera.WorldToScreenPoint(transform.position).z;
+            transform.position = mainCamera.ScreenToWorldPoint(mousePosition) + offset;
+        }
+          
+    }
+    public override void OnDeath()
+    {
+        currentGrid.ClearOccupiedGrids();
+        Destroy(gameObject);
+
+    }
+
+    
     }
 }

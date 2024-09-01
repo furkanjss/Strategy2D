@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Interfaces;
+
 using Models;
 using Views;
 using UnityEngine;
@@ -10,7 +10,7 @@ namespace Controllers
     public class SoldierController : BaseController<SoldierModel, SoldierView>
     {
         [SerializeField] private SoldierData _soldierData;
-
+        public GameObject lastTarget;
         protected override SoldierModel CreateModel()
         {
             return new SoldierModel(_soldierData);
@@ -23,7 +23,7 @@ namespace Controllers
 
         private IEnumerator MoveToGridsSequentially(List<GridPiece> targetGridPieces, bool isAttack, GridPiece attackGrid = null)
         {
-            float delayBetweenMoves = 0.1f;
+            float delayBetweenMoves = 0.05f;
 
             foreach (var gridPiece in targetGridPieces)
             {
@@ -37,15 +37,22 @@ namespace Controllers
 
             if (isAttack)
             {
-                if (attackGrid != null && attackGrid.CurrentObjectOnGrid != null)
-                {
-                    var targetObject = attackGrid.CurrentObjectOnGrid;
+               PerformAttack(attackGrid.GetCurrentObject());
+               lastTarget =attackGrid.GetCurrentObject();
+            }
+        }
 
+        public void PerformAttack(GameObject targetObject)
+        {
+                if (targetObject != null )
+                {
+                    
                     SoldierController soldier = targetObject.GetComponent<SoldierController>();
                     if (soldier != null)
                     {
+                     
                         soldier.ApplyDamage(_model.GetDamage());
-                        yield break; 
+                        return;
                     }
                     BuildingController building = targetObject.GetComponent<BuildingController>();
                     if (building != null)
@@ -53,7 +60,7 @@ namespace Controllers
                         building.ApplyDamage(_model.GetDamage());
                     }
                 }
-            }
+            
         }
         public void SetInformationToPanel()
         {

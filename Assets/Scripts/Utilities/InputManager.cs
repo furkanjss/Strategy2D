@@ -1,5 +1,5 @@
 using System;
-using Interfaces;
+
 using UnityEngine;
 
 namespace Utilities
@@ -7,11 +7,8 @@ namespace Utilities
     public class InputManager:MonoBehaviour
     {
          private Camera _mainCamera;
-        private IDraggable _currentDraggable;
-        private IInteractable _currentInteractable;
-        private bool _isDragging;
         [SerializeField] private LayerMask interactableLayer;
-
+        private GridPiece currentGrid;
         private void Start()
         {
             _mainCamera = Camera.main;
@@ -32,79 +29,54 @@ namespace Utilities
             {
                 HandleRightClick();
             }
-
-            if (_isDragging)
-            {
-                HandleDragging();
-            }
+           
         }
 
         private void ProcessMouseDown()
         {
+            
             Vector2 mousePosition = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
             RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, interactableLayer);
 
             if (hit.collider == null) return;
-
             HandleInteractable(hit.transform);
-            HandleDraggable(hit.transform);
+
         }
 
         private void HandleInteractable(Transform transform)
         {
-            IInteractable interactable = transform.GetComponent<IInteractable>();
+            GridPiece interactable = transform.GetComponent<GridPiece>();
             if (interactable == null) return;
-            if (interactable == _currentInteractable) return;
+            if (interactable == currentGrid) return;
+            interactable.SetInformationToPanel();
+            if (interactable.ContainsSoldier( ))
+            {
+                currentGrid = interactable;
+            }
 
-            if (interactable.CanMove())
-            {
-                interactable.SetInformationToPanel();
-                _currentInteractable = interactable;
-            }
-            else
-            {
-                interactable.SetInformationToPanel();
-            }
         }
-
-        private void HandleDraggable(Transform transform)
-        {
-            _currentDraggable = transform.GetComponent<IDraggable>();
-
-            if (_currentDraggable != null)
-            {
-                _currentInteractable = null;
-                _isDragging = true;
-            }
-         
-        }
-
+        
         private void HandleGridPieceInteraction(Transform transform)
         {
-            GridPiece gridPiece = transform.GetComponent<GridPiece>();
-            if (gridPiece == null) return;
+            GridPiece targetGrid = transform.GetComponent<GridPiece>();
+            if (targetGrid == null) return;
+            if (currentGrid == targetGrid) return;
+            if (currentGrid == null) return;
 
-            if (gridPiece.IsAvailable)
+            if (targetGrid.IsAvailable)
             {
-                _currentInteractable.SetTargetGrid(gridPiece, false);
-                _currentInteractable = null;
+                currentGrid.SetTargetGrid(targetGrid,false);
+                currentGrid = null;
+                InformationPanel.RaiseOnInformationCleared();
             }
             else
             {
-               
-                if (_currentInteractable != null)
-                {
-                    if (_currentInteractable.GetGrid() == gridPiece)
-                    {
-                        return;
-                    }
+              
+                currentGrid.SetTargetGrid(targetGrid, true);
+                currentGrid = null;
+                InformationPanel.RaiseOnInformationCleared();
 
-                    _currentInteractable.SetTargetGrid(gridPiece, true);
-                }
-                else
-                {
-                    Debug.LogWarning("Current interactable is null.");
-                }
+             
             }
         }
 
@@ -117,30 +89,8 @@ namespace Utilities
 
             HandleGridPieceInteraction(hit.transform);
         }
-
-        private void HandleDragging()
-        {
-            if (Input.GetMouseButton(0))
-            {
-                Vector3 mousePosition = GetMouseWorldPosition();
-                _currentDraggable?.OnDrag(mousePosition);
-            }
-
-            if (Input.GetMouseButtonUp(0))
-            {
-                Vector3 mousePosition = GetMouseWorldPosition();
-                _isDragging = false;
-                _currentDraggable?.OnDragEnd(mousePosition);
-                _currentDraggable = null;
-            }
-        }
-
-        private Vector3 GetMouseWorldPosition()
-        {
-            Vector3 mousePosition = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            mousePosition.z = _mainCamera.WorldToScreenPoint(transform.position).z;
-            return mousePosition;
-        }
+        
+    
     }
 }
     

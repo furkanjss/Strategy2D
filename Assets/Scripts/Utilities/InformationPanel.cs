@@ -13,9 +13,16 @@ public class InformationPanel : MonoBehaviour
    [SerializeField] private GameObject SoldierProducedButtonPrefab;
 
    public static event Action<BaseModel> OnInformationSet;
+   public static event Action OnInformationCleared; // Yeni event eklendi
+
    public static void RaiseOnInformationSet(BaseModel model)
    {
-      OnInformationSet?.Invoke(model);
+       OnInformationSet?.Invoke(model);
+   }
+
+   public static void RaiseOnInformationCleared() 
+   {
+       OnInformationCleared?.Invoke();
    }
    [SerializeField] private TextMeshProUGUI nameText;
    [SerializeField] private TextMeshProUGUI healthText;
@@ -75,6 +82,7 @@ public class InformationPanel : MonoBehaviour
     private void OnEnable()
     {
         OnInformationSet += SetInformation;
+        OnInformationCleared += ClearInformation;
     }
 
     private void UpdateHealthView(float health) => healthText.text = $"Health: {health}";
@@ -82,12 +90,20 @@ public class InformationPanel : MonoBehaviour
     private void ClearInformation()
     {
         modelInformation.OnHealthChanged -= UpdateHealthView;
-
-        foreach (Transform child in buttonsParent)
+        healthText.text = " ";
+        nameText.text = " ";
+        modelImage.sprite = null;
+        modelInformation = null;
+        if (buttonsParent.childCount>0)
         {
-            Destroy(child.gameObject);
+            foreach (Transform child in buttonsParent)
+            {
+                Destroy(child.gameObject);
+            }
         }
+        
     }
+
 
     private void OnDisable()
     {
@@ -96,5 +112,7 @@ public class InformationPanel : MonoBehaviour
             modelInformation.OnHealthChanged -= UpdateHealthView;
         }
         OnInformationSet -= SetInformation;
+        OnInformationCleared -= ClearInformation;
+
     }
 }

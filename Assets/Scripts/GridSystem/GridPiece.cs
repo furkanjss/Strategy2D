@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using Controllers;
-using Interfaces;
 using UnityEngine;
 
-public class GridPiece : MonoBehaviour, IInteractable
+public class GridPiece : MonoBehaviour
 {
     public bool IsAvailable { get; private set; }
     public Vector2Int GridPosition { get; private set; }
@@ -16,9 +15,8 @@ public class GridPiece : MonoBehaviour, IInteractable
     private GridManager gridManager;
     private SpriteRenderer spriteRenderer;
     private Collider2D _collider;
-    private SoldierController SoldierController;
+    public SoldierController SoldierController;
 
-    // Listeyi ekliyoruz
     private  List<GridPiece> occupiedObjects = new List<GridPiece>();
 
     private void Awake()
@@ -29,44 +27,61 @@ public class GridPiece : MonoBehaviour, IInteractable
         _collider = GetComponent<Collider2D>();
     }
 
-    public GridPiece GetGrid() => GetComponent<GridPiece>();
 
-    public bool CanMove()
+    public bool ContainsSoldier()
     {
         return SoldierController != null;
     }
 
     public void SetTargetGrid(GridPiece gridPiece, bool isAttack)
     {
-      
+        bool NotMove = true;
         GridPiece targetGrid = gridPiece;
 
         if (isAttack)
         {
-            Vector2Int targetPosition = gridPiece.GridPosition;
-            targetGrid = gridManager.FindClosestAvailableGrid(targetPosition);
-
-            if (targetGrid == null)
+           
+            if (SoldierController.lastTarget==targetGrid.GetCurrentObject()&&SoldierController.lastTarget!=null)
             {
-                Debug.LogWarning("Available Grid Cannot Find");
-                return;
+                NotMove = false;
+            }
+            else
+            {
+                SoldierController.lastTarget= null;
+                Vector2Int targetPosition = gridPiece.GridPosition;
+                targetGrid = gridManager.FindClosestAvailableGrid(targetPosition);
+
+                if (targetGrid == null)
+                {
+                    Debug.LogWarning("Available Grid Cannot Find");
+                    return;
+                }
             }
         }
 
         Debug.Log($"Target Grid: {targetGrid.name}");
-
-        List<GridPiece> path = gridManager.FindShortestPath(this, targetGrid);
-    
-        if (path != null && path.Count > 0)
+        if (NotMove)
         {
-            Debug.Log($"Path found with {path.Count} pieces.");
-            SoldierController.MoveToTarget(path, isAttack, isAttack ? gridPiece : null);
+            List<GridPiece> path = gridManager.FindShortestPath(this, targetGrid);
+    
+            if (path != null && path.Count > 0)
+            {
+                Debug.Log($"Path found with {path.Count} pieces.");
+                SoldierController.MoveToTarget(path, isAttack, isAttack ? gridPiece : null);
+     
+            }
+            else
+            {
+                Debug.LogWarning("No path found.");
+            }
+            
             ClearGrid();
         }
         else
         {
-            Debug.LogWarning("No path found.");
+            SoldierController.PerformAttack(SoldierController.lastTarget);
         }
+       
    
     }
 
@@ -97,7 +112,20 @@ public class GridPiece : MonoBehaviour, IInteractable
         SoldierController = null;
         ApplyWhiteColor();
 
-        if (occupiedObjects.Count > 0)
+       
+    }
+    public GameObject GetCurrentObject() => CurrentObjectOnGrid;
+
+    public void SetSoldierOnGrid(GameObject soldierObj)
+    {
+        IsAvailable = false;
+        CurrentObjectOnGrid = soldierObj;
+        SoldierController = soldierObj.GetComponent<SoldierController>();
+    }
+
+    public void ClearOccupiedGrids()
+    {
+         if (occupiedObjects.Count > 0)
         {
             foreach (GridPiece gridObj in occupiedObjects)
             {
@@ -113,15 +141,6 @@ public class GridPiece : MonoBehaviour, IInteractable
             Debug.Log("No occupied objects to clear.");
         }
     }
-    public GameObject GetCurrentObject() => CurrentObjectOnGrid;
-
-    public void SetSoldierOnGrid(GameObject soldierObj)
-    {
-        IsAvailable = false;
-        CurrentObjectOnGrid = soldierObj;
-        SoldierController = soldierObj.GetComponent<SoldierController>();
-    }
-
     public void SetBuildingOnGrid(GameObject obj, Vector2Int size)
     {
         if (IsPossiblePlaceObject(size))
