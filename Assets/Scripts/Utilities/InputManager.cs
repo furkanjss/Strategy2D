@@ -47,8 +47,8 @@ namespace Utilities
         {
             GridPiece interactable = transform.GetComponent<GridPiece>();
             if (interactable == null) return;
-            if (interactable == currentGrid) return;
             interactable.SetInformationToPanel();
+            if (interactable == currentGrid) return;
             if (interactable.ContainsSoldier( ))
             {
                 currentGrid = interactable;

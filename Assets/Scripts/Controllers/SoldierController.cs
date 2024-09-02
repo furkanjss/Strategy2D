@@ -50,7 +50,6 @@ namespace Controllers
                     SoldierController soldier = targetObject.GetComponent<SoldierController>();
                     if (soldier != null)
                     {
-                     
                         soldier.ApplyDamage(_model.GetDamage());
                         return;
                     }

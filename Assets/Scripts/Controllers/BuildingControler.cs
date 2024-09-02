@@ -36,7 +36,7 @@ namespace Controllers
             _model.ChangeStatus(BuildingStatus.Placed);
             ChangeLayer();
             GetComponent<Collider2D>().enabled = false;
-            Destroy(GetComponent<Rigidbody>());
+            Destroy(GetComponent<Rigidbody2D>());
         }
     }
 
