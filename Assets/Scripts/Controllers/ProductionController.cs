@@ -39,7 +39,7 @@ namespace Controllers
         private void OnProductionButtonClicked()
         {
             _model.ChangeStatus(ProductionStatus.Empty);
-            Vector3 spawnPosition = GetSpawnPosition(); // Spawn pozisyonunu belirle
+            Vector3 spawnPosition = GetSpawnPosition(); 
             Instantiate(_model.GetBuildPrefab(), spawnPosition, Quaternion.identity);
         }
 

@@ -58,7 +58,7 @@ public class InformationPanel : MonoBehaviour
         if (modelInformation == null) return;
 
         modelImage.sprite = modelInformation.GetSprite();
-        nameText.text = modelInformation.Name;
+        nameText.text = "Selected " +modelInformation.Name;
         healthText.text = $"Health: {modelInformation.GetHealth()}";
 
         modelInformation.OnHealthChanged += UpdateHealthView;
@@ -91,7 +91,7 @@ public class InformationPanel : MonoBehaviour
     {
         modelInformation.OnHealthChanged -= UpdateHealthView;
         healthText.text = " ";
-        nameText.text = " ";
+        nameText.text = "Nothing Selected";
         modelImage.sprite = null;
         modelInformation = null;
         if (buttonsParent.childCount>0)

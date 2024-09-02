@@ -22,12 +22,10 @@ namespace Controllers
         _buildingFactory = factoryResolver.GetFactory(_buildingData.buildingType);
         base.Start(); 
     }
-
     protected override BuildingModel CreateModel()
     {
         return _buildingFactory.CreateModel(_buildingData);
     }
-
     public void PlaceBuilding()
     {
         if (_model.GetStatus() == BuildingStatus.Available)
@@ -39,14 +37,11 @@ namespace Controllers
             Destroy(GetComponent<Rigidbody2D>());
         }
     }
-
     private void ChangeLayer()
     {
         int newLayer = LayerMask.NameToLayer("Ignore Raycast");
         gameObject.layer = newLayer;
     }
-    
-
     private void OnMouseUp()
     {
         if (_model.GetStatus() == BuildingStatus.Available)
@@ -102,8 +97,7 @@ namespace Controllers
         currentGrid.ClearOccupiedGrids();
         Destroy(gameObject);
 
+        
     }
-
-    
-    }
+}
 }
